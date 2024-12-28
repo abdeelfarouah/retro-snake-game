@@ -7,44 +7,28 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Node modules and build directories
+node_modules/
+dist/
+dist-ssr/
+package-lock.json
 *.local
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-# Node.js
-node_modules/
 
-# TypeScript
-/dist/
-/build/
+# Temporary files
+*.bak
+*.tmp
+*~
 
-# Vite
-/.vite/
-/.vite/
-
-# Tailwind CSS
-*.log
-
-# System files
-.DS_Store
-Thumbs.db
-
-# IDEs and Editors
-.vscode/
-.idea/
-*.swp
-
-# npm package lock files (if you don’t want to track them)
-package-lock.json
-yarn.lock
+# Tailwind (if applicable)
+.tailwindcss-cache/
