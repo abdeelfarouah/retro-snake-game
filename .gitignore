@@ -7,18 +7,27 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Node modules and build directories
+# Node modules
 node_modules/
+
+# Build directories
 dist/
 dist-ssr/
-package-lock.json
-*.local
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea/
+# Dependency directories (if any)
+.bower_components/
+.cache/
+
+# Package lock files (optional: keep it in some cases)
+# package-lock.json
+
+# Operating System files
 .DS_Store
+Thumbs.db
+
+# IDE or editor directories and files
+.vscode/
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
@@ -32,3 +41,19 @@ package-lock.json
 
 # Tailwind (if applicable)
 .tailwindcss-cache/
+
+# Optional: Environment files (if you're using dotenv or similar)
+.env
+.env.local
+.env.*.local
+
+# Optional: Test directories and coverage reports
+coverage/
+*.lcov
+
+# Other common files/folders
+*.tsbuildinfo
+
+# NPM package related
+package-lock.json # Uncomment if you want to keep package-lock.json tracked
+yarn.lock         # If you're using Yarn, uncomment to track Yarn lock files
