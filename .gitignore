@@ -22,3 +22,29 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Node.js
+node_modules/
+
+# TypeScript
+/dist/
+/build/
+
+# Vite
+/.vite/
+/.vite/
+
+# Tailwind CSS
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+
+# npm package lock files (if you don’t want to track them)
+package-lock.json
+yarn.lock
