@@ -11,7 +11,7 @@ const GAME_SPEED = 150;
 
 export const useGameLogic = () => {
   const [gameBoard, setGameBoard] = useState<Cell[][]>(
-    Array(BOARD_SIZE).fill(Array(BOARD_SIZE).fill('empty'))
+    Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill('empty'))
   );
   const [snake, setSnake] = useState<Position[]>(INITIAL_SNAKE);
   const [direction, setDirection] = useState<Direction>(INITIAL_DIRECTION);
@@ -20,7 +20,13 @@ export const useGameLogic = () => {
   const [isGameOver, setIsGameOver] = useState(false);
   const [isPaused, setIsPaused] = useState(true);
 
-  const generateFood = useCallback(() => {
+  const wrapPosition = (pos: number): number => {
+    if (pos < 0) return BOARD_SIZE - 1;
+    if (pos >= BOARD_SIZE) return 0;
+    return pos;
+  };
+
+  const generateFood = useCallback((): Position => {
     let newFood: Position;
     do {
       newFood = [
@@ -30,7 +36,7 @@ export const useGameLogic = () => {
     } while (
       snake.some(([x, y]) => x === newFood[0] && y === newFood[1])
     );
-    setFood(newFood);
+    return newFood;
   }, [snake]);
 
   const updateBoard = useCallback(() => {
@@ -42,98 +48,113 @@ export const useGameLogic = () => {
       newBoard[x][y] = 'snake';
     });
     newBoard[food[0]][food[1]] = 'food';
-
     setGameBoard(newBoard);
   }, [snake, food]);
+
+  const checkCollision = useCallback(
+    (head: Position): boolean => {
+      // Only check for self-collision, not wall collision
+      return snake.slice(1).some(([sx, sy]) => sx === head[0] && sy === head[1]);
+    },
+    [snake]
+  );
 
   const moveSnake = useCallback(() => {
     if (isPaused || isGameOver) return;
 
-    const head = snake[0];
+    const [headX, headY] = snake[0];
     let newHead: Position;
 
     switch (direction) {
       case 'UP':
-        newHead = [(head[0] - 1 + BOARD_SIZE) % BOARD_SIZE, head[1]];
+        newHead = [wrapPosition(headX - 1), headY];
         break;
       case 'DOWN':
-        newHead = [(head[0] + 1) % BOARD_SIZE, head[1]];
+        newHead = [wrapPosition(headX + 1), headY];
         break;
       case 'LEFT':
-        newHead = [head[0], (head[1] - 1 + BOARD_SIZE) % BOARD_SIZE];
+        newHead = [headX, wrapPosition(headY - 1)];
         break;
       case 'RIGHT':
-        newHead = [head[0], (head[1] + 1) % BOARD_SIZE];
+        newHead = [headX, wrapPosition(headY + 1)];
         break;
     }
 
-    // Check collision with self
-    if (snake.some(([x, y]) => x === newHead[0] && y === newHead[1])) {
+    if (checkCollision(newHead)) {
       setIsGameOver(true);
       return;
     }
 
     const newSnake = [newHead];
-    if (newHead[0] === food[0] && newHead[1] === food[1]) {
-      // Snake ate food
-      setScore(s => s + 1);
-      generateFood();
+    const ateFood = newHead[0] === food[0] && newHead[1] === food[1];
+
+    if (ateFood) {
+      setScore((prev) => prev + 10);
+      setFood(generateFood());
       newSnake.push(...snake);
     } else {
       newSnake.push(...snake.slice(0, -1));
     }
 
     setSnake(newSnake);
-  }, [direction, snake, food, isPaused, isGameOver, generateFood]);
+  }, [snake, direction, food, isPaused, isGameOver, checkCollision, generateFood]);
 
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      switch (e.key) {
-        case 'ArrowUp':
-          if (direction !== 'DOWN') setDirection('UP');
-          break;
-        case 'ArrowDown':
-          if (direction !== 'UP') setDirection('DOWN');
-          break;
-        case 'ArrowLeft':
-          if (direction !== 'RIGHT') setDirection('LEFT');
-          break;
-        case 'ArrowRight':
-          if (direction !== 'LEFT') setDirection('RIGHT');
-          break;
-        case ' ':
-          togglePause();
-          break;
+  const handleKeyPress = useCallback(
+    (event: KeyboardEvent) => {
+      if (isPaused || isGameOver) return;
+
+      const keyDirections: { [key: string]: Direction } = {
+        ArrowUp: 'UP',
+        ArrowDown: 'DOWN',
+        ArrowLeft: 'LEFT',
+        ArrowRight: 'RIGHT',
+      };
+
+      const newDirection = keyDirections[event.key];
+      if (!newDirection) return;
+
+      const opposites = {
+        UP: 'DOWN',
+        DOWN: 'UP',
+        LEFT: 'RIGHT',
+        RIGHT: 'LEFT',
+      };
+
+      if (opposites[newDirection] !== direction) {
+        setDirection(newDirection);
       }
-    };
+    },
+    [direction, isPaused, isGameOver]
+  );
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [direction]);
+  const startGame = () => {
+    setSnake(INITIAL_SNAKE);
+    setDirection(INITIAL_DIRECTION);
+    setFood(generateFood());
+    setScore(0);
+    setIsGameOver(false);
+    setIsPaused(false);
+  };
+
+  const togglePause = () => {
+    if (!isGameOver) {
+      setIsPaused(!isPaused);
+    }
+  };
 
   useEffect(() => {
-    const gameLoop = setInterval(moveSnake, GAME_SPEED);
-    return () => clearInterval(gameLoop);
+    const gameInterval = setInterval(moveSnake, GAME_SPEED);
+    return () => clearInterval(gameInterval);
   }, [moveSnake]);
 
   useEffect(() => {
     updateBoard();
   }, [snake, food, updateBoard]);
 
-  const startGame = () => {
-    setSnake(INITIAL_SNAKE);
-    setDirection(INITIAL_DIRECTION);
-    setScore(0);
-    setIsGameOver(false);
-    setIsPaused(false);
-    generateFood();
-  };
-
-  const togglePause = () => {
-    if (!isGameOver) {
-      setIsPaused(p => !p);
-    }
-  };
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [handleKeyPress]);
 
   return {
     gameBoard,
