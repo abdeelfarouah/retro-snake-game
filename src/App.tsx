@@ -20,11 +20,11 @@ function App() {
       <div className="mt-8 text-gray-400 text-sm">
         <p>Watch the snake change colors as your score increases!</p>
         <ul className="mt-2 text-center">
-          <li>🟢 0-49 points: Green</li>
-          <li>🟧 50+ points: Orange</li>
-          <li>🔵 100+ points: Blue</li>
-          <li>🟡 200+ points: Yellow</li>
-          <li>🟣 300+ points: Purple</li>
+          <li>🟢 0-69 points: Green</li>
+          <li>🟠 70+ points: Orange</li>
+          <li>🔵 120+ points: Blue</li>
+          <li>🟡 250+ points: Yellow</li>
+          <li>🟣 400+ points: Purple</li>
         </ul>
       </div>
     </div>
