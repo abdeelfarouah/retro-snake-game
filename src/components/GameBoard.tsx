@@ -2,6 +2,14 @@ import React from 'react';
 import { useGameLogic } from '../hooks/useGameLogic';
 import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 
+const getSnakeColor = (score: number): string => {
+  if (score >= 300) return 'bg-purple-500';
+  if (score >= 200) return 'bg-yellow-500';
+  if (score >= 100) return 'bg-blue-500';
+  if (score >= 50) return 'bg-orange-500';
+  return 'bg-green-500';
+};
+
 const GameBoard: React.FC = () => {
   const {
     gameBoard,
@@ -12,6 +20,8 @@ const GameBoard: React.FC = () => {
     isPaused,
     togglePause,
   } = useGameLogic();
+
+  const snakeColor = getSnakeColor(score);
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -47,7 +57,7 @@ const GameBoard: React.FC = () => {
                 key={`${i}-${j}`}
                 className={`w-6 h-6 ${
                   cell === 'snake'
-                    ? 'bg-green-500'
+                    ? snakeColor
                     : cell === 'food'
                     ? 'bg-red-500'
                     : 'bg-gray-700'
