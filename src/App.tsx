@@ -8,7 +8,7 @@ function App() {
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-3 mb-2">
           <Gamepad2 className="w-8 h-8 text-green-500" />
-          <h1 className="text-4xl font-bold text-white">Snake Game</h1>
+          <h1 className="text-4xl font-bold text-white">Snake Game Legacy</h1>
         </div>
         <p className="text-gray-400">Use arrow keys or buttons to control the snake</p>
       </div>
